@@ -1,0 +1,432 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Title",
+    "description": "Title",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Berkat Saragih",
+      "email": "testing@huga.store"
+    },
+    "license": {
+      "name": "Nginx License",
+      "url": "https://nginx.org/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{environment}.huga.store/api/v1",
+      "variables": {
+        "environment": {
+          "description": "Server env",
+          "default": "dev",
+          "enum": [
+            "dev",
+            "production"
+          ]
+        },
+        "port" : {
+          "enum": [
+            "443",
+            "80"
+          ],
+          "default": "443"
+        }
+      }
+    }
+  ],
+  "externalDocs": {
+    "description": "Geolocation For Detext Country",
+    "url": "https://dev.maxmind.com/geoip/geolite2-free-geolocation-data"
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Everything About Users"
+    }
+  ],
+  "paths": {
+
+    "/users" : {
+      "get": {
+        "security": [
+          {
+            "UserAuth": []
+          }
+        ],
+        "tags": ["Users"],
+        "summary": "Get All Users List",
+        "description": "Get All Users From The database",
+        "parameters": [
+          {
+            "name": "getById",
+            "in": "query",
+            "required": false,
+            "description": "Get By id User",
+            "schema": {
+              "type": "boolean",
+              "nullable": true,
+              "default": false
+            }
+          },
+          {
+            "name": "filterByName",
+            "in": "query",
+            "required": true,
+            "description": "Filter user By Name",
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "seller": {
+                "value": "seller111",
+                "description": "Example Name #seller111"
+              },
+              "buyer": {
+                "value": "buyer232",
+                "description": "Example Name #buyer232"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succes Find User By id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "buyer232": {
+                    "description": "Sample Get Data Buyer By Name",
+                    "value": {
+                      "id": 1,
+                      "name": "buyer232"
+                    }
+                  },
+                  "seller111": {
+                    "description": "Sample Get data Seller By Name ",
+                    "value": {
+                      "id": 2,
+                      "name": "seller111"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create A New Users",
+        "description": "Allow User To Create account",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "description": "Create A New Users",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateResponse"
+              },
+              "examples": {
+                "buyer1132": {
+                  "$ref": "#/components/examples/UserSamples"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Create User",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                  "$ref": "#/components/schemas/UserCreateResponse"
+                },
+                "examples": {
+                  "buyer1132": {
+                    "$ref": "#/components/examples/UserSamples"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/:userId/email" : {
+      "put": {
+        "tags": ["Users"],
+        "security": [
+          {
+            "UserAuth": []
+          }
+        ],
+        "summary": "Change Email",
+        "description": "Change Email",
+        "parameters": [
+          {
+            "name": "getUserById",
+            "in": "path",
+            "required": true,
+            "description": "Change Email",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "examples": {
+                "buyer232": {
+                  "description": "Sample change email from id ",
+                  "value": {
+                    "new_email": "buyer2232@huga.store"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "old_email" : {
+                      "type": "string",
+                      "required": true
+                    },
+                    "new_email": {
+                      "type": "string",
+                      "required": true
+                    }
+                  }
+                },
+                "examples": {
+                  "buyer1132": {
+                    "description": "Sample Of Update Email From User",
+                    "value": {
+                      "id": 1,
+                      "old_email": "buyer1132@huga.store",
+                      "new_email": "buyer1132@onedrivehub@my.id"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/:userId/reset-password": {
+      "post": {
+        "tags": ["Users"],
+        "security": [
+          {
+            "UserAuth": []
+          }
+        ],
+        "summary": "Change User Password",
+        "description": "allow User to Change Their Password",
+        "parameters": [
+          {
+            "name": "changeUserPasswordById",
+            "in": "path",
+            "required": true,
+            "description": "Change Password",
+            "schema": {
+              "type": "string",
+              "minLength": 6,
+              "maximum": 100
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "old_password": {
+                    "type": "string",
+                    "required": true,
+                    "minLength": 6,
+                    "maxLength": 100
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "required": true,
+                    "minLength": 6,
+                    "maxLength": 100
+                  },
+                  "confirm_password": {
+                    "type": "string",
+                    "required": true,
+                    "minLength": 6,
+                    "maxLength": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Change Password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "old_password" : {
+                      "type": "string",
+                      "required": true
+                    },
+                    "new_password": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "confirm_password": {
+                      "type": "string",
+                      "required": true
+                    }
+                  }
+                },
+                "examples": {
+                  "buyer1132": {
+                    "description": "Sample Of Update Password From User buyer1132",
+                    "value": {
+                      "id": 1,
+                      "old_password": "123123123",
+                      "new_password": "20208878",
+                      "confirm_password": "20208878"
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserCreateResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string",
+            "required": true,
+            "minLength": 6,
+            "maxLength": 100
+          },
+          "email" : {
+            "type": "string",
+            "required": true
+          },
+          "password": {
+            "type": "string",
+            "required": true,
+            "minLength": 8
+          },
+          "country": {
+            "type": "string",
+            "required": false
+          },
+          "telegram_acc": {
+            "type": "string",
+            "required": false
+          },
+          "icq_acc": {
+            "type": "string",
+            "required": false
+          },
+          "is_active": {
+            "type": "number",
+            "required": false,
+            "default": 0
+          },
+          "created_at": {
+            "type": "string",
+            "required": true
+          }
+        }
+      }
+    },
+    "examples": {
+      "UserSamples": {
+        "description": "Example buyer list FROM buyer232",
+        "value": {
+          "name": "buyer232",
+          "email": "buyer232@huga.store",
+          "password": "123123123",
+          "country": "Uzbekhistan",
+          "telegram_acc": "@Udinx",
+          "icq_acc": "@Udinx",
+          "created_at": "5 May 2024"
+        }
+      }
+    },
+    "securitySchemes": {
+      "UserAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    }
+  }
+}
+
